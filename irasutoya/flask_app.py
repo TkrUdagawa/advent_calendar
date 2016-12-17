@@ -11,7 +11,7 @@ from flask import send_file
 
 
 app = Flask(__name__)
-
+app_home=os.path.dirname(__file__)
 @app.route("/")
 def main_view():
     return render_template("index.html")
@@ -21,14 +21,14 @@ def main_view():
 @app.route("/imgs/<year>/<month>")
 @app.route("/imgs/<year>/<month>/<filename>")
 def get_img(year, month, filename):
-    return send_file(os.path.join("static", "imgs", year, month, filename))
+    return send_file(os.path.join(app_home, "static", "imgs", year, month, filename))
 
 @app.route("/more_recommend", methods=["POST"])
 def more_recommend():
     q = query()
     q.body = request.form["text"]
     q.title = request.form["title"]
-    q.img = "./static{}".format(request.form["file_name"])
+    q.img = "{}/static{}".format(app_home,request.form["file_name"])
     method = request.form["method"]
     num = int(request.form["num"])
     res = an.similar_row(q, method, num)
@@ -82,7 +82,7 @@ def parse_result(res):
     result_list = []
     for r in res:
         y, m, t, n = r.id.split("_")
-        with open(os.path.join("static", "article", y, m, "{}_{}.json".format(t, n))) as f:
+        with open(os.path.join(app_home, "static", "article", y, m, "{}_{}.json".format(t, n))) as f:
             j = json.load(f)
             title = j["title"]
             text = j["text"]
